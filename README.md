@@ -20,3 +20,5 @@ Because I also fly the 747 in FSEconomy, I liked to have a simple way to calcula
 - Output of the loads per tank in metric (ton or 1000th of kgs), imperial (lbs) and imperial (gal in the way FSEconomy calculates).
 - Get curret load from sim (X-Plane 11)
 - Set calculated load to sim (X-Plane 11)
+## Donate
+If you appreciate my work and want to donate some money. Feel free to do so: https://paypal.me/MagicOizo
