@@ -32,10 +32,10 @@ namespace B747_Fuel_Distribution_Calculator
             btnSetToXP.Enabled = false;
             aircrafts = new Aircraft[]
             {
-                new Aircraft("SSG B747-8I", 60000,162643,438181,45923,520459,99500,1913453,new int[] {1,2,7,3,4,5,6,8}),
-                new Aircraft("SSG B747-8F", 60000, 162486, 436908, 45135, 515317, -1, 1804375, new int[] {1,2,6,3,-1,4,5,7}),
-                new Aircraft("mSparks B747-400", 60000, 136220, 381320, 40180, 521670, 100300, 1737410,new int[] {2,3,6,1,8,4,5,7}),
-                new Aircraft("Laminar B747-400", 60000, 135158, 381216, 39854, 521220, 100769, 1734447,new int[] {2,3,6,1,8,4,5,7})
+                new Aircraft("SSG B747-8I", 60000,162643,438181,45923,520459,99500,1913453,new int[] {1,2,7,3,4,5,6,8}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 4" }),
+                new Aircraft("SSG B747-8F", 60000, 162486, 436908, 45135, 515317, -1, 1804375, new int[] {1,2,6,3,-1,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "", "Main 3", "Main 4", "Reserve 4" }),
+                new Aircraft("mSparks B747-400", 60000, 136220, 381320, 40180, 521670, 100300, 1737410,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" }),
+                new Aircraft("Laminar B747-400", 60000, 135158, 381216, 39854, 521220, 100769, 1734447,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" })
             };
             for(int i = 0; i < aircrafts.Length; i++)
             {
@@ -98,6 +98,7 @@ namespace B747_Fuel_Distribution_Calculator
 
         private void fillTanks(long targetLoad)
         {
+
             //Step 1 up to 6.000 kg per Main Tank
             if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14)
             {
@@ -169,6 +170,10 @@ namespace B747_Fuel_Distribution_Calculator
 
         private void displayFormatedValues()
         {
+            if(MainTank == null || ReserveTank == null || MainTank.Length < 4 || ReserveTank.Length < 2)
+            {
+                return;
+            }
             //kg Values will always get displayed as kg
             textBox9.Text = ((float)MainTank[0] / 10).ToString("#,##0.0");
             textBox10.Text = ((float)MainTank[1] / 10).ToString("#,##0.0");
@@ -322,18 +327,26 @@ namespace B747_Fuel_Distribution_Calculator
 
         private void cmbAircraft_SelectedIndexChanged(object sender, EventArgs e)
         {
-            label2.Text = "XP Tank "  +  aircrafts[cmbAircraft.SelectedIndex].Labels[0];
+            label2.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[0];
             label3.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[1];
             label1.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[2];
             label4.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[3];
             label5.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[4];
             if (aircrafts[cmbAircraft.SelectedIndex].Labels[4] == -1)
             {
-                label5.Text = "INOP";
+                label5.Text = "";
             }
             label6.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[5];
             label15.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[6];
             label7.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[7];
+            label8.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[0];
+            label9.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[1];
+            label10.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[2];
+            label11.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[3];
+            label12.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[4];
+            label13.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[5];
+            label16.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[6];
+            label14.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[7];
         }
 
         private void chkTopMost_CheckedChanged(object sender, EventArgs e)
@@ -355,8 +368,8 @@ namespace B747_Fuel_Distribution_Calculator
                 if(calculated)
                 {
                     txtInput.Text = targetLoad.ToString("#,##0.0");
-                    displayFormatedValues();
                 }
+                displayFormatedValues();
                 return;
             }
             if (radImperialFormat.Checked)
@@ -370,8 +383,8 @@ namespace B747_Fuel_Distribution_Calculator
                 if (calculated)
                 {
                     txtInput.Text = Math.Round((double)targetLoad * 1000/KG_PER_LBS,1).ToString("#,##0.0");
-                    displayFormatedValues();
                 }
+                displayFormatedValues();
                 return;
             }
             if (radGalonsFormat.Checked)
@@ -385,15 +398,10 @@ namespace B747_Fuel_Distribution_Calculator
                 if (calculated)
                 {
                     txtInput.Text = Math.Round((double)targetLoad * 1000 * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                    displayFormatedValues();
                 }
+                displayFormatedValues();
                 return;
             }
-        }
-
-        private void B747FDC_Load(object sender, EventArgs e)
-        {
-
         }
     }
 }

@@ -642,7 +642,7 @@
             this.AcceptButton = this.btnClac;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(975, 156);
+            this.ClientSize = new System.Drawing.Size(975, 158);
             this.Controls.Add(this.lblKg);
             this.Controls.Add(this.lblNumberFormat);
             this.Controls.Add(this.groupBox1);
@@ -661,7 +661,6 @@
             this.MaximizeBox = false;
             this.Name = "B747FDC";
             this.Text = "B747 Fuel Distribution Calculator";
-            this.Load += new System.EventHandler(this.B747FDC_Load);
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.groupBox1.ResumeLayout(false);

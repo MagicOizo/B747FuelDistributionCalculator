@@ -17,8 +17,9 @@ namespace B747_Fuel_Distribution_Calculator
         public long StabLimit { get; private set; }
         public long CapacityLimit { get; private set; }
         public int[] Labels { get; private set; }
+        public string[] TankNames { get; private set; }
 
-        public Aircraft(string AircraftName, long MainTreshold14, long MainLimit14, long MainLimit23, long ReserveLimit14, long CenterLimit, long StabLimit, long CapacityLimit, int[] Labels)
+        public Aircraft(string AircraftName, long MainTreshold14, long MainLimit14, long MainLimit23, long ReserveLimit14, long CenterLimit, long StabLimit, long CapacityLimit, int[] Labels, string[] TankNames)
         {
             this.AircraftName = AircraftName;
             this.MainLimit14 = MainLimit14;
@@ -29,6 +30,7 @@ namespace B747_Fuel_Distribution_Calculator
             this.StabLimit = StabLimit;
             this.CapacityLimit = CapacityLimit;
             this.Labels = Labels;
+            this.TankNames = TankNames;
         }
     }
 }
