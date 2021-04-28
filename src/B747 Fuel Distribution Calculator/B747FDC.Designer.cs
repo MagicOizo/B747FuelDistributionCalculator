@@ -77,8 +77,11 @@
             this.radMetricFormat = new System.Windows.Forms.RadioButton();
             this.lblNumberFormat = new System.Windows.Forms.Label();
             this.lblKg = new System.Windows.Forms.Label();
+            this.btnVisual = new System.Windows.Forms.Button();
+            this.picVisualization = new System.Windows.Forms.PictureBox();
             this.tableLayoutPanel1.SuspendLayout();
             this.groupBox1.SuspendLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picVisualization)).BeginInit();
             this.SuspendLayout();
             // 
             // txtInput
@@ -637,12 +640,35 @@
             this.lblKg.TabIndex = 10;
             this.lblKg.Text = "kg";
             // 
+            // btnVisual
+            // 
+            this.btnVisual.Location = new System.Drawing.Point(7, 156);
+            this.btnVisual.Name = "btnVisual";
+            this.btnVisual.Size = new System.Drawing.Size(145, 23);
+            this.btnVisual.TabIndex = 11;
+            this.btnVisual.Text = "↓ Expand visualazation ↓";
+            this.btnVisual.UseVisualStyleBackColor = true;
+            this.btnVisual.Click += new System.EventHandler(this.btnVisual_Click);
+            // 
+            // picVisualization
+            // 
+            this.picVisualization.BackgroundImage = ((System.Drawing.Image)(resources.GetObject("picVisualization.BackgroundImage")));
+            this.picVisualization.BackgroundImageLayout = System.Windows.Forms.ImageLayout.Center;
+            this.picVisualization.Location = new System.Drawing.Point(7, 156);
+            this.picVisualization.Name = "picVisualization";
+            this.picVisualization.Size = new System.Drawing.Size(957, 401);
+            this.picVisualization.TabIndex = 12;
+            this.picVisualization.TabStop = false;
+            this.picVisualization.Paint += new System.Windows.Forms.PaintEventHandler(this.picVisualization_Paint);
+            this.picVisualization.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picVisualization_MouseClick);
+            // 
             // B747FDC
             // 
             this.AcceptButton = this.btnClac;
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(975, 158);
+            this.ClientSize = new System.Drawing.Size(975, 557);
+            this.Controls.Add(this.btnVisual);
             this.Controls.Add(this.lblKg);
             this.Controls.Add(this.lblNumberFormat);
             this.Controls.Add(this.groupBox1);
@@ -656,15 +682,17 @@
             this.Controls.Add(this.tableLayoutPanel1);
             this.Controls.Add(this.btnClac);
             this.Controls.Add(this.txtInput);
+            this.Controls.Add(this.picVisualization);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.FixedSingle;
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "B747FDC";
-            this.Text = "B747 Fuel Distribution Calculator";
+            this.Text = "B747 Fuel Distribution Calculator (v0.9.1)";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.groupBox1.ResumeLayout(false);
             this.groupBox1.PerformLayout();
+            ((System.ComponentModel.ISupportInitialize)(this.picVisualization)).EndInit();
             this.ResumeLayout(false);
             this.PerformLayout();
 
@@ -720,6 +748,8 @@
         private System.Windows.Forms.RadioButton radMetricFormat;
         private System.Windows.Forms.Label lblNumberFormat;
         private System.Windows.Forms.Label lblKg;
+        private System.Windows.Forms.Button btnVisual;
+        private System.Windows.Forms.PictureBox picVisualization;
     }
 }
 

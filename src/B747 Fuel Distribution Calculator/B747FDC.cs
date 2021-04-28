@@ -1,12 +1,6 @@
 ﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel;
-using System.Data;
 using System.Drawing;
-using System.Linq;
 using System.Net.Sockets;
-using System.Text;
-using System.Threading.Tasks;
 using System.Windows.Forms;
 
 namespace B747_Fuel_Distribution_Calculator
@@ -20,6 +14,7 @@ namespace B747_Fuel_Distribution_Calculator
         long[] ReserveTank;
         long StabelizerTank;
         bool calculated;
+        int indexSelection;
 
         const double FSECONOMY_GALON_PER_KG = 0.3794; //Get kg do: value / this; get gal do: value * this 
         const double KG_PER_LBS = 0.45359237; //Get kg do: value * this; get lbs do: value / this 
@@ -32,18 +27,21 @@ namespace B747_Fuel_Distribution_Calculator
             btnSetToXP.Enabled = false;
             aircrafts = new Aircraft[]
             {
-                new Aircraft("SSG B747-8I", 60000,162643,438181,45923,520459,99500,1913453,new int[] {1,2,7,3,4,5,6,8}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 4" }),
-                new Aircraft("SSG B747-8F", 60000, 162486, 436908, 45135, 515317, -1, 1804375, new int[] {1,2,6,3,-1,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "", "Main 3", "Main 4", "Reserve 4" }),
-                new Aircraft("mSparks B747-400", 60000, 136220, 381320, 40180, 521670, 100300, 1737410,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" }),
-                new Aircraft("Laminar B747-400", 60000, 135158, 381216, 39854, 521220, 100769, 1734447,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" })
+                new Aircraft("SSG B747-8I", 60000,162643,438181,45923,520459,99500,1913453,new int[] {1,2,7,3,4,5,6,8}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 4" },Properties.Resources.ScematicB748I),
+                new Aircraft("SSG B747-8F", 60000, 162486, 436908, 45135, 515317, -1, 1804375, new int[] {1,2,6,3,-1,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 1", "Center", "", "Main 3", "Main 4", "Reserve 4" },Properties.Resources.ScematicB748F),
+                new Aircraft("mSparks B747-400", 181437, 136220, 381320, 40180, 521670, 100300, 1737410,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" },Properties.Resources.ScematicB744),
+                new Aircraft("Laminar B747-400", 181437, 135158, 381216, 39854, 521220, 100769, 1734447,new int[] {2,3,6,1,8,4,5,7}, new string[] {"Main 1", "Main 2", "Reserve 2", "Center", "Stabelizer", "Main 3", "Main 4", "Reserve 3" },Properties.Resources.ScematicB744)
             };
             for(int i = 0; i < aircrafts.Length; i++)
             {
                 cmbAircraft.Items.Add(aircrafts[i].AircraftName + " (max. " + ((double)aircrafts[i].CapacityLimit / 10000).ToString("#,##0.0000") + " ton)");
             }
             cmbAircraft.SelectedIndex = 0;
+            indexSelection = 0;
             radMetricFormat.Checked = true;
             lblTotal.Text = "";
+            this.Height = 223;
+            picVisualization.Visible = false;
         }
 
         private void txtInput_KeyDown(object sender, KeyEventArgs e)
@@ -85,82 +83,145 @@ namespace B747_Fuel_Distribution_Calculator
                 MessageBox.Show("Max Fuel Capacity exceeded!", "Calculate Fuel Load", MessageBoxButtons.OK);
                 return;
             }
-            MainTank = new long[] { 0, 0, 0, 0 };
-            CenterTank = 0;
-            ReserveTank = new long[] { 0, 0 };
-            StabelizerTank = 0;
+            resetCalculatiion();
 
             fillTanks(targetLoadL);
             displayFormatedValues();
+            if (picVisualization.Visible == true)
+            {
+                picVisualization.Invalidate();
+            }
             calculated = true;
             btnSetToXP.Enabled = true;
         }
 
         private void fillTanks(long targetLoad)
         {
-
-            //Step 1 up to 6.000 kg per Main Tank
-            if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14)
+            long tempLoadSum;
+            switch (cmbAircraft.SelectedIndex)
             {
-                MainTank[0] = (long)(targetLoad / 4);
-                MainTank[1] = MainTank[0];
-                MainTank[2] = MainTank[0];
-                MainTank[3] = MainTank[0];
-                return;
+                case 0:
+                case 1:
+                    //Step 1 up to 6.000 kg per Main Tank
+                    if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14)
+                    {
+                        MainTank[0] = (long)(targetLoad / 4);
+                        MainTank[1] = MainTank[0];
+                        MainTank[2] = MainTank[0];
+                        MainTank[3] = MainTank[0];
+                        return;
+                    }
+                    MainTank[0] = aircrafts[cmbAircraft.SelectedIndex].MainTreshold14;
+                    MainTank[1] = MainTank[0];
+                    MainTank[2] = MainTank[0];
+                    MainTank[3] = MainTank[0];
+                    tempLoadSum = 4 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14;
+                    //Step 2 up to full Reserve Tanks 1 and 4
+                    if (targetLoad < tempLoadSum + (4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14))
+                    {
+                        ReserveTank[0] = (long)((targetLoad - tempLoadSum) / 4);
+                        MainTank[1] += ReserveTank[0];
+                        MainTank[2] = MainTank[1];
+                        ReserveTank[1] = ReserveTank[0];
+                        return;
+                    }
+                    ReserveTank[0] = aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                    MainTank[1] += ReserveTank[0];
+                    MainTank[2] = MainTank[1];
+                    ReserveTank[1] = ReserveTank[0];
+                    tempLoadSum += 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                    //Step 3 up to full Main Tanks 1 and 4
+                    if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14)
+                    {
+                        MainTank[0] += (long)((targetLoad - tempLoadSum) / 4);
+                        MainTank[1] += (long)((targetLoad - tempLoadSum) / 4);
+                        MainTank[2] = MainTank[1];
+                        MainTank[3] = MainTank[0];
+                        return;
+                    }
+                    MainTank[0] = aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                    MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                    MainTank[2] = MainTank[1];
+                    MainTank[3] = MainTank[0];
+                    tempLoadSum = 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                    //Step 4 up to full Main Tanks 2 and 3
+                    if (targetLoad < 2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23)
+                    {
+                        MainTank[1] += (long)((targetLoad - tempLoadSum) / 2);
+                        MainTank[2] = MainTank[1];
+                        return;
+                    }
+                    MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                    MainTank[2] = MainTank[1];
+                    tempLoadSum = 2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                    //Step 5 up to full Center Tank
+                    if (targetLoad < tempLoadSum + aircrafts[cmbAircraft.SelectedIndex].CenterLimit)
+                    {
+                        CenterTank = (long)(targetLoad - tempLoadSum);
+                        return;
+                    }
+                    CenterTank = aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
+                    tempLoadSum += aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
+                    //Step 6 up to full Stabelizer Tank
+                    StabelizerTank = (long)(targetLoad - tempLoadSum);
+                    break;
+                default:
+                    //Step 1 Main 1 - 4 full up to Main 1/4 Limit
+                    if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14)
+                    {
+                        MainTank[0] = (long)(targetLoad / 4);
+                        MainTank[1] = MainTank[0];
+                        MainTank[2] = MainTank[0];
+                        MainTank[3] = MainTank[0];
+                        return;
+                    }
+                    MainTank[0] = aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                    MainTank[1] = MainTank[0];
+                    MainTank[2] = MainTank[0];
+                    MainTank[3] = MainTank[0];
+                    tempLoadSum = 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                    //Step 2 up to Main 2/3 Threshold
+                    if (targetLoad < (2* aircrafts[cmbAircraft.SelectedIndex].MainLimit14) + (2 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14))
+                    {
+                        MainTank[1] += (long)((targetLoad - tempLoadSum) / 2);
+                        MainTank[2] = MainTank[1];
+                        return;
+                    }
+                    MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainTreshold14;
+                    MainTank[2] = MainTank[1];
+                    tempLoadSum = (2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14) + (2 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14);
+                    //Step 3 up to full Main Tanks 1 and 4
+                    if (targetLoad < tempLoadSum + (2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14))
+                    {
+                        ReserveTank[0] = (long)((targetLoad - tempLoadSum) / 2);
+                        ReserveTank[1] = ReserveTank[0];
+                        return;
+                    }
+                    ReserveTank[0] = aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                    ReserveTank[1] = ReserveTank[0];
+                    tempLoadSum += (2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14);
+                    //Step 4 up to full Main Tanks 2 and 3
+                    if (targetLoad < 2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23)
+                    {
+                        MainTank[1] += (long)((targetLoad - tempLoadSum) / 2);
+                        MainTank[2] = MainTank[1];
+                        return;
+                    }
+                    MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                    MainTank[2] = MainTank[1];
+                    tempLoadSum = 2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                    //Step 5 up to full Center Tank
+                    if (targetLoad < tempLoadSum + aircrafts[cmbAircraft.SelectedIndex].CenterLimit)
+                    {
+                        CenterTank = (long)(targetLoad - tempLoadSum);
+                        return;
+                    }
+                    CenterTank = aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
+                    tempLoadSum += aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
+                    //Step 6 up to full Stabelizer Tank
+                    StabelizerTank = (long)(targetLoad - tempLoadSum);
+                    break;
             }
-            MainTank[0] = aircrafts[cmbAircraft.SelectedIndex].MainTreshold14;
-            MainTank[1] = MainTank[0];
-            MainTank[2] = MainTank[0];
-            MainTank[3] = MainTank[0];
-            long tempLoadSum = 4 * aircrafts[cmbAircraft.SelectedIndex].MainTreshold14;
-            //Step 2 up to full Reserve Tanks 1 and 4
-            if (targetLoad < tempLoadSum + (4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14))
-            {
-                ReserveTank[0] = (long)((targetLoad - tempLoadSum) / 4);
-                MainTank[1] += ReserveTank[0];
-                MainTank[2] = MainTank[1];
-                ReserveTank[1] = ReserveTank[0];
-                return;
-            }
-            ReserveTank[0] = aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
-            MainTank[1] += ReserveTank[0];
-            MainTank[2] = MainTank[1];
-            ReserveTank[1] = ReserveTank[0];
-            tempLoadSum += 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
-            //Step 3 up to full Main Tanks 1 and 4
-            if (targetLoad < 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14)
-            {
-                MainTank[0] += (long)((targetLoad - tempLoadSum) / 4);
-                MainTank[1] += (long)((targetLoad - tempLoadSum) / 4);
-                MainTank[2] = MainTank[1];
-                MainTank[3] = MainTank[0];
-                return;
-            }
-            MainTank[0] = aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
-            MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
-            MainTank[2] = MainTank[1];
-            MainTank[3] = MainTank[0];
-            tempLoadSum = 4 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 4 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
-            //Step 4 up to full Main Tanks 2 and 3
-            if (targetLoad < 2* aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23)
-            {
-                MainTank[1] += (long)((targetLoad - tempLoadSum) / 2);
-                MainTank[2] = MainTank[1];
-                return;
-            }
-            MainTank[1] = aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
-            MainTank[2] = MainTank[1];
-            tempLoadSum = 2 * aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit14 + 2 * aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
-            //Step 5 up to full Center Tank
-            if (targetLoad < tempLoadSum + aircrafts[cmbAircraft.SelectedIndex].CenterLimit)
-            {
-                CenterTank = (long)(targetLoad - tempLoadSum);
-                return;
-            }
-            CenterTank = aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
-            tempLoadSum += aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
-            //Step 6 up to full Stabelizer Tank
-            StabelizerTank = (long)(targetLoad - tempLoadSum);
         }
 
         private long sumTank()
@@ -184,42 +245,26 @@ namespace B747_Fuel_Distribution_Calculator
             textBox15.Text = ((float)MainTank[3] / 10).ToString("#,##0.0");
             textBox16.Text = ((float)ReserveTank[1] / 10).ToString("#,##0.0");
             //other values will be displayed on basis of selected format
+            textBox1.Text = getFormatedValue((double)MainTank[0], false);
+            textBox2.Text = getFormatedValue((double)MainTank[1], false);
+            textBox3.Text = getFormatedValue((double)ReserveTank[0], false);
+            textBox4.Text = getFormatedValue((double)CenterTank, false);
+            textBox5.Text = getFormatedValue((double)StabelizerTank, false);
+            textBox6.Text = getFormatedValue((double)MainTank[2], false);
+            textBox7.Text = getFormatedValue((double)MainTank[3], false);
+            textBox8.Text = getFormatedValue((double)ReserveTank[1], false);
             if (radMetricFormat.Checked)
             {
-                textBox1.Text = Math.Round(((double)MainTank[0] / 10000), 1).ToString("#,##0.0");
-                textBox2.Text = Math.Round(((double)MainTank[1] / 10000), 1).ToString("#,##0.0");
-                textBox3.Text = Math.Round(((double)ReserveTank[0] / 10000), 1).ToString("#,##0.0");
-                textBox4.Text = Math.Round(((double)CenterTank / 10000), 1).ToString("#,##0.0");
-                textBox5.Text = Math.Round(((double)StabelizerTank / 10000), 1).ToString("#,##0.0");
-                textBox6.Text = Math.Round(((double)MainTank[2] / 10000), 1).ToString("#,##0.0");
-                textBox7.Text = Math.Round(((double)MainTank[3] / 10000), 1).ToString("#,##0.0");
-                textBox8.Text = Math.Round(((double)ReserveTank[1] / 10000), 1).ToString("#,##0.0");
                 lblTotal.Text = "Total: " + ((float)sumTank() / 10).ToString("#,##0.0") + " kg or " + (Math.Round(((double)MainTank[0] / 10000), 1) + Math.Round(((double)MainTank[1] / 10000), 1) + Math.Round(((double)MainTank[2] / 10000), 1) + Math.Round(((double)MainTank[3] / 10000), 1) + Math.Round(((double)ReserveTank[0] / 10000), 1) + Math.Round(((double)ReserveTank[1] / 10000), 1) + Math.Round(((double)CenterTank / 10000), 1) + Math.Round(((double)StabelizerTank / 10000), 1)).ToString("#,##0.0") + " ton";
                 return;
             }
             if (radImperialFormat.Checked)
             {
-                textBox1.Text = Math.Round(((double)MainTank[0] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox2.Text = Math.Round(((double)MainTank[1] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox3.Text = Math.Round(((double)ReserveTank[0] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox4.Text = Math.Round(((double)CenterTank / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox5.Text = Math.Round(((double)StabelizerTank / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox6.Text = Math.Round(((double)MainTank[2] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox7.Text = Math.Round(((double)MainTank[3] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
-                textBox8.Text = Math.Round(((double)ReserveTank[1] / 10) / KG_PER_LBS, 1).ToString("#,##0.0");
                 lblTotal.Text = "Total: " + Math.Round(((double)sumTank() / 10) / KG_PER_LBS, 1).ToString("#,##0.0") + " lbs";
                 return;
             }
             if (radGalonsFormat.Checked)
             {
-                textBox1.Text = Math.Round(((double)MainTank[0] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox2.Text = Math.Round(((double)MainTank[1] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox3.Text = Math.Round(((double)ReserveTank[0] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox4.Text = Math.Round(((double)CenterTank / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox5.Text = Math.Round(((double)StabelizerTank / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox6.Text = Math.Round(((double)MainTank[2] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox7.Text = Math.Round(((double)MainTank[3] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
-                textBox8.Text = Math.Round(((double)ReserveTank[1] / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0");
                 lblTotal.Text = "Total: " + Math.Round(((double)sumTank() / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0") + " gal of JetA";
                 return;
             }
@@ -327,6 +372,10 @@ namespace B747_Fuel_Distribution_Calculator
 
         private void cmbAircraft_SelectedIndexChanged(object sender, EventArgs e)
         {
+            if (cmbAircraft.SelectedIndex != indexSelection)
+            {
+                resetCalculatiion();
+            }
             label2.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[0];
             label3.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[1];
             label1.Text = "XP Tank " + aircrafts[cmbAircraft.SelectedIndex].Labels[2];
@@ -347,6 +396,23 @@ namespace B747_Fuel_Distribution_Calculator
             label13.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[5];
             label16.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[6];
             label14.Text = aircrafts[cmbAircraft.SelectedIndex].TankNames[7];
+            if(picVisualization.Visible == true)
+            {
+                picVisualization.BackgroundImage = aircrafts[cmbAircraft.SelectedIndex].Visualization;
+                picVisualization.Invalidate();
+            }
+            indexSelection = cmbAircraft.SelectedIndex;
+        }
+
+        private void resetCalculatiion()
+        {
+            MainTank = new long[] { 0, 0, 0, 0 };
+            CenterTank = 0;
+            ReserveTank = new long[] { 0, 0 };
+            StabelizerTank = 0;
+            calculated = false;
+            btnSetToXP.Enabled = false;
+            displayFormatedValues();
         }
 
         private void chkTopMost_CheckedChanged(object sender, EventArgs e)
@@ -362,7 +428,7 @@ namespace B747_Fuel_Distribution_Calculator
                 lblInputFormat.Text = "x 1000 kg (ton)";
                 for(int i = 0; i < aircrafts.Length; i++)
                 {
-                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + ((double)aircrafts[i].CapacityLimit / 10000).ToString("#,##0.0000") + " ton)";
+                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + getFormatedValue((double)aircrafts[i].CapacityLimit,true) + ")";
             }
                 txtInput.Text = "0";
                 if(calculated)
@@ -378,7 +444,7 @@ namespace B747_Fuel_Distribution_Calculator
                 lblInputFormat.Text = "lbs";
                 for (int i = 0; i < aircrafts.Length; i++)
                 {
-                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + ((double)aircrafts[i].CapacityLimit / 10 / KG_PER_LBS).ToString("#,##0.0") + " lbs)";
+                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + getFormatedValue((double)aircrafts[i].CapacityLimit, true) + ")";
                 }
                 if (calculated)
                 {
@@ -393,7 +459,7 @@ namespace B747_Fuel_Distribution_Calculator
                 lblInputFormat.Text = "gal of JetA";
                 for (int i = 0; i < aircrafts.Length; i++)
                 {
-                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + ((double)aircrafts[i].CapacityLimit / 10 *FSECONOMY_GALON_PER_KG).ToString("#,##0.0") + " gal of JetA)";
+                    cmbAircraft.Items[i] = aircrafts[i].AircraftName + " (max. " + getFormatedValue((double)aircrafts[i].CapacityLimit, true) + " of JetA)";
                 }
                 if (calculated)
                 {
@@ -402,6 +468,173 @@ namespace B747_Fuel_Distribution_Calculator
                 displayFormatedValues();
                 return;
             }
+        }
+
+        private void btnVisual_Click(object sender, EventArgs e)
+        {
+            if(btnVisual.Text== "↓ Expand visualazation ↓")
+            {
+                btnVisual.Text = "↑ Contract visualazation ↑";
+                this.Height = 596;
+                picVisualization.Visible = true;
+                picVisualization.Invalidate();
+            }
+            else
+            {
+                btnVisual.Text = "↓ Expand visualazation ↓";
+                this.Height = 223;
+                picVisualization.Visible = false;
+            }
+        }
+
+        private void picVisualization_MouseClick(object sender, MouseEventArgs e)
+        {
+            Console.WriteLine(e.Location.ToString());
+            picVisualization.Invalidate();
+        }
+
+        private string getFormatedValue(double kgs, bool withUnit)
+        {
+            string unitText = "";
+            if (radMetricFormat.Checked)
+            {
+                if(withUnit)
+                {
+                    unitText = " ton";
+                }
+                return Math.Round((kgs / 10000), 1).ToString("#,##0.0") + unitText;
+            }
+            if (radImperialFormat.Checked)
+            {
+                if (withUnit)
+                {
+                    unitText = " lbs";
+                }
+                return Math.Round((kgs / 10) / KG_PER_LBS, 1).ToString("#,##0.0") + unitText;
+            }
+            if (withUnit)
+            {
+                unitText = " gal";
+            }
+            return Math.Round((kgs / 10) * FSECONOMY_GALON_PER_KG, 1).ToString("#,##0.0") + unitText;
+        }
+
+        private void picVisualization_Paint(object sender, PaintEventArgs e)
+        {
+            Pen tankBorder = new Pen(Brushes.Black, 2);
+            Font prozentFont = new Font(FontFamily.GenericSansSerif, 12F, FontStyle.Bold);
+            Font valueFont = new Font(FontFamily.GenericSansSerif, 8.25F, FontStyle.Regular);
+            if (calculated)
+            {
+                //Reserve 0
+                float tempPercent = (float)ReserveTank[0] / (float)aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                string tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ?"0.0":"0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 164, (float)(350F - (50F * tempPercent)), 50, (50F * tempPercent)); 
+                SizeF tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 189 - (tempTextSize.Width / 2), 302);
+                e.Graphics.DrawRectangle(tankBorder, 164, 300, 50, 50);
+                tempText = getFormatedValue((double)ReserveTank[0], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 189 - (tempTextSize.Width / 2), 352);
+
+                //Reserve 1
+                tempPercent = (float)ReserveTank[1] / (float)aircrafts[cmbAircraft.SelectedIndex].ReserveLimit14;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 743, (float)(350F - (50F * tempPercent)), 50, (50F * tempPercent)); 
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 768 - (tempTextSize.Width / 2), 302);
+                e.Graphics.DrawRectangle(tankBorder, 743, 300, 50, 50);
+                tempText = getFormatedValue((double)ReserveTank[1], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 768 - (tempTextSize.Width / 2), 352);
+
+                //Main 0
+                tempPercent = (float)MainTank[0] / (float)aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 262, (float)(300F - (90F * tempPercent)), 70, (90F * tempPercent));
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 297 - (tempTextSize.Width / 2), 212);
+                e.Graphics.DrawRectangle(tankBorder, 262, 210, 70, 90);
+                tempText = getFormatedValue((double)MainTank[0], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 297 - (tempTextSize.Width / 2), 302);
+
+                //Main 1
+                tempPercent = (float)MainTank[1] / (float)aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 361, (float)(250F - (130F * tempPercent)), 70, (130F * tempPercent));
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 396 - (tempTextSize.Width / 2), 122);
+                e.Graphics.DrawRectangle(tankBorder, 361, 120, 70, 130);
+                tempText = getFormatedValue((double)MainTank[1], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 396 - (tempTextSize.Width / 2), 252);
+
+                //Main 2
+                tempPercent = (float)MainTank[2] / (float)aircrafts[cmbAircraft.SelectedIndex].MainLimit23;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 525, (float)(250F - (130F * tempPercent)), 70, (130F * tempPercent));
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 560 - (tempTextSize.Width / 2), 122);
+                e.Graphics.DrawRectangle(tankBorder, 525, 120, 70, 130);
+                tempText = getFormatedValue((double)MainTank[2], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 560 - (tempTextSize.Width / 2), 252);
+
+                //Main 3
+                tempPercent = (float)MainTank[3] / (float)aircrafts[cmbAircraft.SelectedIndex].MainLimit14;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 625, (float)(300F - (90F * tempPercent)), 70, (90F * tempPercent));
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 660 - (tempTextSize.Width / 2), 212);
+                e.Graphics.DrawRectangle(tankBorder, 625, 210, 70, 90);
+                tempText = getFormatedValue((double)MainTank[3], true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 660 - (tempTextSize.Width / 2), 302);
+
+                //Center
+                tempPercent = (float)CenterTank / (float)aircrafts[cmbAircraft.SelectedIndex].CenterLimit;
+                tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                e.Graphics.FillRectangle(Brushes.DarkBlue, 452, (float)(236F - (170F * tempPercent)), 53, (170F * tempPercent));
+                tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 478.5F - (tempTextSize.Width / 2), 68);
+                e.Graphics.DrawRectangle(tankBorder, 452, 66, 53, 170);
+                tempText = getFormatedValue((double)CenterTank, true);
+                tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 478.5F - (tempTextSize.Width / 2), 238);
+
+                //Sabelizer
+                if (aircrafts[cmbAircraft.SelectedIndex].StabLimit > 0)
+                {
+                    tempPercent = (float)StabelizerTank / (float)aircrafts[cmbAircraft.SelectedIndex].StabLimit;
+                    tempText = (tempPercent * 100F).ToString((tempPercent < 0.1) ? "0.0" : "0") + "%";
+                    e.Graphics.FillRectangle(Brushes.DarkBlue, 445, (float)(363F - (70F * tempPercent)), 65, (70F * tempPercent));
+                    tempTextSize = e.Graphics.MeasureString(tempText, prozentFont);
+                    e.Graphics.DrawString(tempText, prozentFont, Brushes.White, 477.5F - (tempTextSize.Width / 2), 295);
+                    e.Graphics.DrawRectangle(tankBorder, 445, 293, 65, 70);
+                    tempText = getFormatedValue((double)StabelizerTank, true);
+                    tempTextSize = e.Graphics.MeasureString(tempText, valueFont);
+                    e.Graphics.DrawString(tempText, valueFont, Brushes.Black, 477.5F - (tempTextSize.Width / 2), 365);
+                }
+
+                // TANK/ENG Message
+                tempText = "Take Off with \"Tank to Engine\"";
+                if(cmbAircraft.SelectedIndex < 2)
+                {
+                    if(MainTank[0] + ReserveTank[0] >= MainTank[1])
+                    {
+                        e.Graphics.DrawString(tempText, prozentFont, Brushes.Red, 60, 130);
+                    }
+                }
+                else
+                {
+                    if (MainTank[0] >= MainTank[1] + ReserveTank[0])
+                    {
+                        e.Graphics.DrawString(tempText, prozentFont, Brushes.Red, 60, 130);
+                    }
+                }
+            }
+
         }
     }
 }
