@@ -1,10 +1,14 @@
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Debug\B747 Fuel Distribution Calculator.exe.config
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Debug\B747 Fuel Distribution Calculator.exe
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Debug\B747 Fuel Distribution Calculator.pdb
-D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.csprojAssemblyReference.cache
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747_Fuel_Distribution_Calculator.B747FDC.resources
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747_Fuel_Distribution_Calculator.Properties.Resources.resources
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.csproj.GenerateResource.cache
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.csproj.CoreCompileInputs.cache
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.exe
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.pdb
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Debug\B747 Fuel Distribution Calculator.exe.manifest
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Debug\B747 Fuel Distribution Calculator.application
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.exe.manifest
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.application
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Debug\B747 Fuel Distribution Calculator.TrustInfo.xml

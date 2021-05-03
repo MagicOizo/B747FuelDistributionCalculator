@@ -90,8 +90,8 @@
             this.txtInput.Name = "txtInput";
             this.txtInput.Size = new System.Drawing.Size(100, 20);
             this.txtInput.TabIndex = 0;
-            this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.txtInput_KeyDown);
-            this.txtInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.txtInput_KeyPress);
+            this.txtInput.KeyDown += new System.Windows.Forms.KeyEventHandler(this.TxtInput_KeyDown);
+            this.txtInput.KeyPress += new System.Windows.Forms.KeyPressEventHandler(this.TxtInput_KeyPress);
             // 
             // btnClac
             // 
@@ -101,7 +101,7 @@
             this.btnClac.TabIndex = 1;
             this.btnClac.Text = "calculate";
             this.btnClac.UseVisualStyleBackColor = true;
-            this.btnClac.Click += new System.EventHandler(this.btnClac_Click);
+            this.btnClac.Click += new System.EventHandler(this.BtnClac_Click);
             // 
             // tableLayoutPanel1
             // 
@@ -533,7 +533,7 @@
             this.btnGetFromXP.TabIndex = 5;
             this.btnGetFromXP.Text = "Get from X-Plane";
             this.btnGetFromXP.UseVisualStyleBackColor = true;
-            this.btnGetFromXP.Click += new System.EventHandler(this.btnGetFromXP_Click);
+            this.btnGetFromXP.Click += new System.EventHandler(this.BtnGetFromXP_Click);
             // 
             // btnSetToXP
             // 
@@ -543,7 +543,7 @@
             this.btnSetToXP.TabIndex = 5;
             this.btnSetToXP.Text = "Set in X-Plane";
             this.btnSetToXP.UseVisualStyleBackColor = true;
-            this.btnSetToXP.Click += new System.EventHandler(this.btnSetToXP_Click);
+            this.btnSetToXP.Click += new System.EventHandler(this.BtnSetToXP_Click);
             // 
             // cmbAircraft
             // 
@@ -552,7 +552,7 @@
             this.cmbAircraft.Name = "cmbAircraft";
             this.cmbAircraft.Size = new System.Drawing.Size(255, 21);
             this.cmbAircraft.TabIndex = 6;
-            this.cmbAircraft.SelectedIndexChanged += new System.EventHandler(this.cmbAircraft_SelectedIndexChanged);
+            this.cmbAircraft.SelectedIndexChanged += new System.EventHandler(this.CmbAircraft_SelectedIndexChanged);
             // 
             // label18
             // 
@@ -572,7 +572,7 @@
             this.chkTopMost.TabIndex = 8;
             this.chkTopMost.Text = "Always on top";
             this.chkTopMost.UseVisualStyleBackColor = true;
-            this.chkTopMost.CheckedChanged += new System.EventHandler(this.chkTopMost_CheckedChanged);
+            this.chkTopMost.CheckedChanged += new System.EventHandler(this.ChkTopMost_CheckedChanged);
             // 
             // groupBox1
             // 
@@ -596,7 +596,7 @@
             this.radGalonsFormat.TabStop = true;
             this.radGalonsFormat.Text = "Imperial (gal)";
             this.radGalonsFormat.UseVisualStyleBackColor = true;
-            this.radGalonsFormat.CheckedChanged += new System.EventHandler(this.radFormats_CheckedChanged);
+            this.radGalonsFormat.CheckedChanged += new System.EventHandler(this.RadFormats_CheckedChanged);
             // 
             // radImperialFormat
             // 
@@ -608,7 +608,7 @@
             this.radImperialFormat.TabStop = true;
             this.radImperialFormat.Text = "Imperial (lbs)";
             this.radImperialFormat.UseVisualStyleBackColor = true;
-            this.radImperialFormat.CheckedChanged += new System.EventHandler(this.radFormats_CheckedChanged);
+            this.radImperialFormat.CheckedChanged += new System.EventHandler(this.RadFormats_CheckedChanged);
             // 
             // radMetricFormat
             // 
@@ -620,7 +620,7 @@
             this.radMetricFormat.TabStop = true;
             this.radMetricFormat.Text = "Metric (ton) ";
             this.radMetricFormat.UseVisualStyleBackColor = true;
-            this.radMetricFormat.CheckedChanged += new System.EventHandler(this.radFormats_CheckedChanged);
+            this.radMetricFormat.CheckedChanged += new System.EventHandler(this.RadFormats_CheckedChanged);
             // 
             // lblNumberFormat
             // 
@@ -646,9 +646,9 @@
             this.btnVisual.Name = "btnVisual";
             this.btnVisual.Size = new System.Drawing.Size(145, 23);
             this.btnVisual.TabIndex = 11;
-            this.btnVisual.Text = "↓ Expand visualazation ↓";
+            this.btnVisual.Text = "↓ Expand visualization ↓";
             this.btnVisual.UseVisualStyleBackColor = true;
-            this.btnVisual.Click += new System.EventHandler(this.btnVisual_Click);
+            this.btnVisual.Click += new System.EventHandler(this.BtnVisual_Click);
             // 
             // picVisualization
             // 
@@ -659,8 +659,8 @@
             this.picVisualization.Size = new System.Drawing.Size(957, 401);
             this.picVisualization.TabIndex = 12;
             this.picVisualization.TabStop = false;
-            this.picVisualization.Paint += new System.Windows.Forms.PaintEventHandler(this.picVisualization_Paint);
-            this.picVisualization.MouseClick += new System.Windows.Forms.MouseEventHandler(this.picVisualization_MouseClick);
+            this.picVisualization.Paint += new System.Windows.Forms.PaintEventHandler(this.PicVisualization_Paint);
+            this.picVisualization.MouseClick += new System.Windows.Forms.MouseEventHandler(this.PicVisualization_MouseClick);
             // 
             // B747FDC
             // 
@@ -687,7 +687,7 @@
             this.Icon = ((System.Drawing.Icon)(resources.GetObject("$this.Icon")));
             this.MaximizeBox = false;
             this.Name = "B747FDC";
-            this.Text = "B747 Fuel Distribution Calculator (v0.9.1)";
+            this.Text = "B747 Fuel Distribution Calculator (v0.9.2)";
             this.tableLayoutPanel1.ResumeLayout(false);
             this.tableLayoutPanel1.PerformLayout();
             this.groupBox1.ResumeLayout(false);

@@ -8,3 +8,8 @@ D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.csproj.CoreCompileInputs.cache
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.exe
 D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.pdb
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Release\B747 Fuel Distribution Calculator.exe.manifest
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\bin\Release\B747 Fuel Distribution Calculator.application
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.TrustInfo.xml
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.exe.manifest
+D:\C#-Projekte\B747 Fuel Distribution Calculator\B747FuelDistributionCalculator\src\B747 Fuel Distribution Calculator\obj\Release\B747 Fuel Distribution Calculator.application
